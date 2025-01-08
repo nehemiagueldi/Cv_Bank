@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.model.Person;
 import com.example.demo.repository.PersonRepository;
 import com.example.demo.utils.CustomResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +28,9 @@ public class PersonRestController {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", personRepository.findAll());
     }
 
-    @PostMapping("/post")
-    public ResponseEntity<Object> postMethodName() {
+    @PostMapping("/person")
+    public ResponseEntity<Object> post(@RequestBody Person person) {
+        personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 

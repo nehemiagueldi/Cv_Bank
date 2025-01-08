@@ -1,23 +1,27 @@
 package com.example.demo.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity //define sebuah table didatabase
+@Entity // define sebuah table didatabase
 @Table(name = "tb_cv_person")
-@Data //anotasi data, gantinya setter getter dari lombok
-@AllArgsConstructor //constructor dengan parameter semua properti
-@NoArgsConstructor //constructor tidak menggunakan parameter
+@Data // anotasi data, gantinya setter getter dari lombok
+@AllArgsConstructor // constructor dengan parameter semua properti
+@NoArgsConstructor // constructor tidak menggunakan parameter
 public class CVPerson {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,4 +36,10 @@ public class CVPerson {
   @ManyToOne
   @JoinColumn(name = "person_id", referencedColumnName = "id")
   private Person person;
+
+  @OneToMany(mappedBy = "cvPerson")
+  private List<Project> projects;
+
+  @OneToMany(mappedBy = "cvPerson")
+  private List<Training> trainings;
 }

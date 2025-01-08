@@ -1,6 +1,6 @@
 package com.example.demo.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,18 +14,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity //define sebuah table didatabase
+@Entity // define sebuah table didatabase
 @Table(name = "tb_education")
-@Data //anotasi data, gantinya setter getter dari lombok
-@AllArgsConstructor //constructor dengan parameter semua properti
-@NoArgsConstructor //constructor tidak menggunakan parameter
+@Data // anotasi data, gantinya setter getter dari lombok
+@AllArgsConstructor // constructor dengan parameter semua properti
+@NoArgsConstructor // constructor tidak menggunakan parameter
 public class Education {
   @Id // PK
   @GeneratedValue(strategy = GenerationType.IDENTITY) // AI
   private Integer id;
   private Double gpa;
-  private LocalDateTime startDate;
-  private LocalDateTime endDate;
+  private LocalDate startDate;
+  private LocalDate endDate;
   @ManyToOne
   @JoinColumn(name = "university_id", referencedColumnName = "id")
   private University university;
