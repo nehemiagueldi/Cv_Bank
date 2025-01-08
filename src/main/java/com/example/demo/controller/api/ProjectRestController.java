@@ -32,7 +32,7 @@ public class ProjectRestController {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", projectRepository.findAll());
     }
 
-    @PostMapping("/project")
+    @PostMapping("/add/project")
     public ResponseEntity<Object> post(@RequestBody Project project) {
         project.setCvPerson(cvPersonRepository.findById(project.getCvPerson().getId()).get());
         projectRepository.save(project);
