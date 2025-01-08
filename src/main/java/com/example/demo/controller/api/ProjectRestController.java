@@ -32,14 +32,16 @@ public class ProjectRestController {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", projectRepository.findAll());
     }
 
-    @PostMapping("/project")
+    @PostMapping("/add/project")
     public ResponseEntity<Object> post(@RequestBody Project project) {
         project.setCvPerson(cvPersonRepository.findById(project.getCvPerson().getId()).get());
         projectRepository.save(project);
 
-        CVPerson cvPerson = cvPersonRepository.findById(project.getCvPerson().getId()).get();
-        cvPerson.setPercentage_progress(cvPerson.getPercentage_progress()+20);
-        cvPersonRepository.save(cvPerson);
+        if (projectRepository.countByCVId(project.getCvPerson().getId()) == 1) {
+            CVPerson cvPerson = cvPersonRepository.findById(project.getCvPerson().getId()).get();
+            cvPerson.setPercentage_progress(cvPerson.getPercentage_progress()+20);
+            cvPersonRepository.save(cvPerson);
+        }
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 
