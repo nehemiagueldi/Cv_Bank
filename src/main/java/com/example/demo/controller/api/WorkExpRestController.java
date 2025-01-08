@@ -8,41 +8,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CVPerson;
-import com.example.demo.model.Project;
+import com.example.demo.model.WorkExp;
 import com.example.demo.repository.CVPersonRepository;
-import com.example.demo.repository.ProjectRepository;
+import com.example.demo.repository.WorkExpRepository;
 import com.example.demo.utils.CustomResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api")
-public class ProjectRestController {
-    private ProjectRepository projectRepository;
+public class WorkExpRestController {
+    private WorkExpRepository workExpRepository;
     private CVPersonRepository cvPersonRepository;
 
     @Autowired
-    public ProjectRestController(ProjectRepository projectRepository, CVPersonRepository cvPersonRepository) {
-        this.projectRepository = projectRepository;
+    public WorkExpRestController(WorkExpRepository workExpRepository, CVPersonRepository cvPersonRepository) {
+        this.workExpRepository = workExpRepository;
         this.cvPersonRepository = cvPersonRepository;
     }
 
-    @GetMapping("/project")
+    @GetMapping("work-exp")
     public ResponseEntity<Object> get() {
-        return CustomResponse.generate(HttpStatus.OK, "Data Found", projectRepository.findAll());
+        return CustomResponse.generate(HttpStatus.OK, "Data Found", workExpRepository.findAll());
     }
 
-    @PostMapping("/add/project")
-    public ResponseEntity<Object> post(@RequestBody Project project) {
-        project.setCvPerson(cvPersonRepository.findById(project.getCvPerson().getId()).get());
-        projectRepository.save(project);
+    @PostMapping("work-exp")
+    public ResponseEntity<Object> post(@RequestBody WorkExp workExp) {
+        workExp.setCvPerson(cvPersonRepository.findById(workExp.getCvPerson().getId()).get());
+        workExpRepository.save(workExp);
 
-        if (projectRepository.countByCVId(project.getCvPerson().getId()) == 1) {
-            CVPerson cvPerson = cvPersonRepository.findById(project.getCvPerson().getId()).get();
+        if (workExpRepository.countByCVId(workExp.getCvPerson().getId()) == 1) {
+            CVPerson cvPerson = cvPersonRepository.findById(workExp.getCvPerson().getId()).get();
             cvPerson.setPercentage_progress(cvPerson.getPercentage_progress() + 20);
             cvPersonRepository.save(cvPerson);
         }
-        return CustomResponse.generate(HttpStatus.OK, "Data Saved");
+        return CustomResponse.generate(HttpStatus.OK, "Data Save");
     }
 
 }
