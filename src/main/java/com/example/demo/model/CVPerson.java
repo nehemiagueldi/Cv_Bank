@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,10 +38,4 @@ public class CVPerson {
   @ManyToOne
   @JoinColumn(name = "person_id", referencedColumnName = "id")
   private Person person;
-
-  @OneToMany(mappedBy = "cvPerson")
-  private List<Project> projects;
-
-  @OneToMany(mappedBy = "cvPerson")
-  private List<Training> trainings;
 }
