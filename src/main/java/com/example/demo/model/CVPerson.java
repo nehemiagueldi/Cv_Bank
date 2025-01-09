@@ -26,7 +26,7 @@ public class CVPerson {
   private String photo_profile;
   @Column(length = 80, nullable = false)
   private String position;
-  @Column(length = 255, nullable = false)
+  @Column(columnDefinition = "TEXT", length = 2000, nullable = false)
   private String summary;
   private Double percentage_progress;
   @ManyToOne
