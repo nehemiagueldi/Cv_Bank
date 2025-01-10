@@ -3,6 +3,7 @@ package com.example.demo.controller.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import com.example.demo.repository.CVToolRepository;
 import com.example.demo.repository.ToolRepository;
 import com.example.demo.utils.CustomResponse;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/cv-tool")
 public class CVToolRestController {
@@ -62,10 +64,10 @@ public class CVToolRestController {
     if (cvTool.getCvPerson().getId() == cvToolEdit.getCvPerson().getId()) {
       cvTool.setTool(toolRepository.findById(cvToolEdit.getTool().getId()).get());
       cvToolRepository.save(cvTool);
+      return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
     } else {
       return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
     }
-    return CustomResponse.generate(HttpStatus.OK, "Data Saved", cvTool);
   }
 
   @DeleteMapping("delete/{id}")

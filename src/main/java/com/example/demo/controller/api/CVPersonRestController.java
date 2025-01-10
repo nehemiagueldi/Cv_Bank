@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
+@CrossOrigin
 @RestController
 @RequestMapping("api/cv-person")
 public class CVPersonRestController {
@@ -61,7 +61,6 @@ public class CVPersonRestController {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", cvPersonRepository.findAll());
     }
 
-    @CrossOrigin
     @GetMapping("{id}")
     public CVPersonDTO get(@PathVariable Integer id) {
         return new CVPersonDTO(cvPersonRepository.findById(id).get(), projectRepository.getByCVId(id),
