@@ -8,9 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +31,6 @@ public class WorkExp {
     @Column(length = 255, nullable = false)
     private String name;
 
-    // @Lob
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
 
@@ -42,6 +43,7 @@ public class WorkExp {
     @Column(nullable = false)
     private LocalDate end_date;
 
+    @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToOne
     @JoinColumn(name = "cv_id", referencedColumnName = "id")
     private CVPerson cvPerson;

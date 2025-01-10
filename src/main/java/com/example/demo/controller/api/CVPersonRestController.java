@@ -7,37 +7,72 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CVPerson;
+
+import com.example.demo.model.dto.CVPersonDTO;
+
 import com.example.demo.repository.CVPersonRepository;
+import com.example.demo.repository.CVSkillRepository;
+import com.example.demo.repository.CVToolRepository;
+import com.example.demo.repository.EducationRepository;
+import com.example.demo.repository.PersonRepository;
+import com.example.demo.repository.ProjectRepository;
+import com.example.demo.repository.TrainingRepository;
+import com.example.demo.repository.WorkExpRepository;
 import com.example.demo.utils.CustomResponse;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 @RestController
-@RequestMapping("api")
+@RequestMapping("api/cv-person")
 public class CVPersonRestController {
     private CVPersonRepository cvPersonRepository;
+    private PersonRepository personRepository;
+    private ProjectRepository projectRepository;
+    private EducationRepository educationRepository;
+    private WorkExpRepository workExpRepository;
+    private TrainingRepository trainingRepository;
+    private CVToolRepository cvToolRepository;
+    private CVSkillRepository cvSkillRepository;
 
     @Autowired
-    public CVPersonRestController(CVPersonRepository cvPersonRepository) {
+    public CVPersonRestController(CVPersonRepository cvPersonRepository, PersonRepository personRepository,
+            ProjectRepository projectRepository, EducationRepository educationRepository,
+            WorkExpRepository workExpRepository, TrainingRepository trainingRepository,
+            CVToolRepository cvToolRepository, CVSkillRepository cvSkillRepository) {
         this.cvPersonRepository = cvPersonRepository;
+        this.personRepository = personRepository;
+        this.projectRepository = projectRepository;
+        this.educationRepository = educationRepository;
+        this.workExpRepository = workExpRepository;
+        this.trainingRepository = trainingRepository;
+        this.cvToolRepository = cvToolRepository;
+        this.cvSkillRepository = cvSkillRepository;
     }
 
-    @GetMapping("/cvperson")
+
+    @GetMapping
     public ResponseEntity<Object> get() {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", cvPersonRepository.findAll());
     }
 
     @CrossOrigin
-    @GetMapping("/cvperson/{id}")
-    public ResponseEntity<Object> getCvPersonById(@PathVariable Integer id){
-        CVPerson cvPerson = cvPersonRepository.findById(id).orElse(null);
-        if (cvPerson != null) {
-            return CustomResponse.generate(HttpStatus.OK, "Data Berhasil Didapatkan", cvPerson);
-        } else {
-            return CustomResponse.generate(HttpStatus.OK, "Data Tidak Ditemukan");
-        }
+    @GetMapping("{id}")
+    public CVPersonDTO get(@PathVariable Integer id) {
+        return new CVPersonDTO(cvPersonRepository.findById(id).get(), projectRepository.getByCVId(id),
+                educationRepository.getByCVId(id), workExpRepository.getByCVId(id), trainingRepository.getByCVId(id),
+                cvToolRepository.getByCVId(id), cvSkillRepository.getByCVId(id));
     }
 
+    @PostMapping
+    public ResponseEntity<Object> post(@RequestBody CVPerson cvPerson) {
+        cvPerson.setPerson(personRepository.findById(cvPerson.getPerson().getId()).get());
+        cvPersonRepository.save(cvPerson);
+        return CustomResponse.generate(HttpStatus.OK, "Data Saved");
+    }
 }
