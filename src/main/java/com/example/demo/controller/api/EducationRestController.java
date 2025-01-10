@@ -62,7 +62,7 @@ public class EducationRestController {
             cvPerson.setPercentage_progress(cvPerson.getPercentage_progress() + 20);
             cvPersonRepository.save(cvPerson);
         }
-        return CustomResponse.generate(HttpStatus.OK, "Data Save");
+        return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 
     @PutMapping("edit/{id}")

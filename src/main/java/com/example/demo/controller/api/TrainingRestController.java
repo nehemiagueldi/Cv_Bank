@@ -67,7 +67,6 @@ public class TrainingRestController {
     } else {
       return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
     }
-
   }
 
   @DeleteMapping("delete/{id}")

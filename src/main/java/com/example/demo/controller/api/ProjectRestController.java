@@ -33,7 +33,7 @@ public class ProjectRestController {
         this.projectRepository = projectRepository;
         this.cvPersonRepository = cvPersonRepository;
     }
-  
+
     @CrossOrigin
     @GetMapping
     public ResponseEntity<Object> get() {
