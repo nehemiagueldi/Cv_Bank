@@ -3,7 +3,9 @@ package com.example.demo.controller.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +21,7 @@ import com.example.demo.repository.CVPersonRepository;
 import com.example.demo.repository.TrainingRepository;
 import com.example.demo.utils.CustomResponse;
 
+@CrossOrigin
 @RestController
 @RequestMapping("api/training")
 public class TrainingRestController {
@@ -31,6 +34,7 @@ public class TrainingRestController {
     this.cvPersonRepository = cvPersonRepository;
   }
 
+  @CrossOrigin
   @GetMapping
   public ResponseEntity<Object> get() {
     return CustomResponse.generate(HttpStatus.OK, "Data Found", trainingRepository.findAll());
@@ -59,11 +63,11 @@ public class TrainingRestController {
       training.setStart_date(trainingEdit.getStart_date());
       training.setEnd_date(trainingEdit.getEnd_date());
       trainingRepository.save(training);
+      return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
     } else {
       return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
     }
 
-    return CustomResponse.generate(HttpStatus.OK, "Data Saved");
   }
 
   @DeleteMapping("delete/{id}")
