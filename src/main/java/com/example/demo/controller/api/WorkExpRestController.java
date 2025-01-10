@@ -3,6 +3,7 @@ package com.example.demo.controller.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@CrossOrigin
 @RestController
-@RequestMapping("api")
+@RequestMapping("api/work-exp")
 public class WorkExpRestController {
     private WorkExpRepository workExpRepository;
     private CVPersonRepository cvPersonRepository;
@@ -31,12 +33,12 @@ public class WorkExpRestController {
         this.cvPersonRepository = cvPersonRepository;
     }
 
-    @GetMapping("work-exp")
+    @GetMapping
     public ResponseEntity<Object> get() {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", workExpRepository.findAll());
     }
 
-    @PostMapping("/work-exp")
+    @PostMapping
     public ResponseEntity<Object> post(@RequestBody WorkExp workExp) {
         workExp.setCvPerson(cvPersonRepository.findById(workExp.getCvPerson().getId()).get());
         workExpRepository.save(workExp);
@@ -49,7 +51,7 @@ public class WorkExpRestController {
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 
-    @PutMapping("/work-exp/edit/{id}")
+    @PutMapping("edit/{id}")
     public ResponseEntity<Object> put(@PathVariable Integer id, @RequestBody WorkExp workExpEdit) {
         WorkExp workExp = workExpRepository.findById(id).get();
         if (workExp.getCvPerson().getId() == workExpEdit.getCvPerson().getId()) {
@@ -59,13 +61,13 @@ public class WorkExpRestController {
             workExp.setStart_date(workExpEdit.getStart_date());
             workExp.setEnd_date(workExpEdit.getEnd_date());
             workExpRepository.save(workExp);
+            return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
         } else {
             return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
         }
-        return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
     }
 
-    @DeleteMapping("/work-exp/delete/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<Object> delete(@PathVariable Integer id, @RequestParam("cvId") Integer cvId) {
         if (workExpRepository.countByCVId(cvId) == 1) {
             CVPerson cvPerson = cvPersonRepository.findById(cvId).get();
