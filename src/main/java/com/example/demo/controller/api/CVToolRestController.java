@@ -65,7 +65,7 @@ public class CVToolRestController {
     } else {
       return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
     }
-    return CustomResponse.generate(HttpStatus.OK, "Data Saved", cvTool);
+    return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully", cvTool);
   }
 
   @DeleteMapping("delete/{id}")

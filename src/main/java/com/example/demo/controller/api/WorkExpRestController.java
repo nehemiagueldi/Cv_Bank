@@ -46,7 +46,7 @@ public class WorkExpRestController {
             cvPerson.setPercentage_progress(cvPerson.getPercentage_progress() + 20);
             cvPersonRepository.save(cvPerson);
         }
-        return CustomResponse.generate(HttpStatus.OK, "Data Save");
+        return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 
     @PutMapping("/work-exp/edit/{id}")
@@ -62,7 +62,7 @@ public class WorkExpRestController {
         } else {
             return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
         }
-        return CustomResponse.generate(HttpStatus.OK, "Data Save");
+        return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
     }
 
     @DeleteMapping("/work-exp/delete/{id}")

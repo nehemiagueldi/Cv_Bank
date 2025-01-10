@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RestController
 @RequestMapping("api/cv-person")
 public class CVPersonRestController {
@@ -54,7 +53,6 @@ public class CVPersonRestController {
         this.cvToolRepository = cvToolRepository;
         this.cvSkillRepository = cvSkillRepository;
     }
-
 
     @GetMapping
     public ResponseEntity<Object> get() {

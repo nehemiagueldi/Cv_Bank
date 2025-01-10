@@ -65,7 +65,7 @@ public class TrainingRestController {
       return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
     }
 
-    return CustomResponse.generate(HttpStatus.OK, "Data Saved");
+    return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
   }
 
   @DeleteMapping("delete/{id}")

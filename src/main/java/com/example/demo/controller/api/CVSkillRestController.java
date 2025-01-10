@@ -66,7 +66,7 @@ public class CVSkillRestController {
     } else {
       return CustomResponse.generate(HttpStatus.OK, "Data Not Found");
     }
-    return CustomResponse.generate(HttpStatus.OK, "Data Saved", cvSkill);
+    return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully", cvSkill);
   }
 
   @DeleteMapping("delete/{id}")
