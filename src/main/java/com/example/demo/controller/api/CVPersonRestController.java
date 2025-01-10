@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CVPerson;
+
 import com.example.demo.model.dto.CVPersonDTO;
+
 import com.example.demo.repository.CVPersonRepository;
 import com.example.demo.repository.CVSkillRepository;
 import com.example.demo.repository.CVToolRepository;
@@ -18,10 +20,13 @@ import com.example.demo.repository.TrainingRepository;
 import com.example.demo.repository.WorkExpRepository;
 import com.example.demo.utils.CustomResponse;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("api/cv-person")
@@ -50,11 +55,13 @@ public class CVPersonRestController {
         this.cvSkillRepository = cvSkillRepository;
     }
 
+
     @GetMapping
     public ResponseEntity<Object> get() {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", cvPersonRepository.findAll());
     }
 
+    @CrossOrigin
     @GetMapping("{id}")
     public CVPersonDTO get(@PathVariable Integer id) {
         return new CVPersonDTO(cvPersonRepository.findById(id).get(), projectRepository.getByCVId(id),
