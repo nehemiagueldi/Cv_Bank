@@ -23,7 +23,7 @@ public class CVPerson {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-  @Column(length = 80, nullable = true)
+  @Column(nullable = true)
   private String photo_profile;
   @Column(length = 80, nullable = false)
   private String position;
