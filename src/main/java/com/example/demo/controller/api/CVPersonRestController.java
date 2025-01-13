@@ -55,7 +55,6 @@ public class CVPersonRestController {
         this.cvSkillRepository = cvSkillRepository;
     }
 
-
     @GetMapping
     public ResponseEntity<Object> get() {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", cvPersonRepository.findAll());
