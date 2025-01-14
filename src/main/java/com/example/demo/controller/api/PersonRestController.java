@@ -43,8 +43,6 @@ public class PersonRestController {
         Person person = personRepository.findById(id).get();
         person.setName(personEdit.getName());
         person.setEmail(personEdit.getEmail());
-        person.setPhone(personEdit.getPhone());
-        person.setAddress(personEdit.getAddress());
         person.setBirthdate(personEdit.getBirthdate());
         person.setGender(personEdit.getGender());
         personRepository.save(person);

@@ -30,6 +30,7 @@ public class CVPerson {
   @Column(columnDefinition = "TEXT", length = 2000, nullable = false)
   private String summary;
   private Double percentage_progress;
+  private String randomString;
   @ManyToOne
   @JoinColumn(name = "person_id", referencedColumnName = "id")
   private Person person;

@@ -60,11 +60,11 @@ public class CVPersonRestController {
         return CustomResponse.generate(HttpStatus.OK, "Data Found", cvPersonRepository.findAll());
     }
 
-    @GetMapping("{id}")
-    public CVPersonDTO get(@PathVariable Integer id) {
-        return new CVPersonDTO(cvPersonRepository.findById(id).get(), projectRepository.getByCVId(id),
-                educationRepository.getByCVId(id), workExpRepository.getByCVId(id), trainingRepository.getByCVId(id),
-                cvToolRepository.getByCVId(id), cvSkillRepository.getByCVId(id));
+    @GetMapping("{randomString}")
+    public CVPersonDTO get(@PathVariable String randomString) {
+        CVPerson cvPerson = cvPersonRepository.getCVByRS(randomString);
+        return new CVPersonDTO(cvPerson, projectRepository.getByCVId(cvPerson.getId()),
+                educationRepository.getByCVId(cvPerson.getId()), workExpRepository.getByCVId(cvPerson.getId()), trainingRepository.getByCVId(cvPerson.getId()), cvToolRepository.getByCVId(cvPerson.getId()), cvSkillRepository.getByCVId(cvPerson.getId()));
     }
 
     @PostMapping
