@@ -29,6 +29,7 @@ public class PersonRestController {
     @Autowired
     public PersonRestController(PersonRepository personRepository, CVPersonRepository cvPersonRepository) {
         this.personRepository = personRepository;
+        this.cvPersonRepository = cvPersonRepository;
     }
 
     @GetMapping
@@ -48,7 +49,7 @@ public class PersonRestController {
         CVPerson cvPerson = new CVPerson();
         cvPerson.setPercentage_progress(0.0);
         cvPerson.setRandomString(registerDTO.getRandomString());
-        cvPerson.setPerson(personRepository.getById(person.getId()));
+        cvPerson.setPerson(personRepository.findById(person.getId()).get());
         cvPersonRepository.save(cvPerson);
 
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");

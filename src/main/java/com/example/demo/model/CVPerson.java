@@ -25,9 +25,9 @@ public class CVPerson {
   private Integer id;
   @Column(nullable = true)
   private String photo_profile;
-  @Column(length = 80, nullable = false)
+  @Column(length = 80, nullable = true)
   private String position;
-  @Column(columnDefinition = "TEXT", length = 2000, nullable = false)
+  @Column(columnDefinition = "TEXT", length = 2000, nullable = true)
   private String summary;
   private Double percentage_progress;
   private String randomString;
