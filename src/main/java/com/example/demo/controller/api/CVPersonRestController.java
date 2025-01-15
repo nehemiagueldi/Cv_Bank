@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CVPerson;
-
+import com.example.demo.model.Person;
 import com.example.demo.model.dto.CVPersonDTO;
-
+import com.example.demo.model.dto.CVPersonEditDTO;
 import com.example.demo.repository.CVPersonRepository;
 import com.example.demo.repository.CVSkillRepository;
 import com.example.demo.repository.CVToolRepository;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @CrossOrigin
@@ -58,20 +59,45 @@ public class CVPersonRestController {
 
     @GetMapping
     public ResponseEntity<Object> get() {
-        return CustomResponse.generate(HttpStatus.OK, "Data Found", cvPersonRepository.findAll());
+        return CustomResponse.generate(HttpStatus.OK, "Data Found",
+                cvPersonRepository.findAll());
+    }
+
+    @GetMapping("percent")
+    public ResponseEntity<Object> getData(@RequestParam("email") String email) {
+        return CustomResponse.generate(HttpStatus.OK, "Data Found",
+                cvPersonRepository.getPercentagerProgress(email));
     }
 
     @GetMapping("{randomString}")
     public CVPersonDTO get(@PathVariable String randomString) {
-        CVPerson cvPerson = cvPersonRepository.getCVByRS(randomString);
-        return new CVPersonDTO(cvPerson, projectRepository.getByCVId(cvPerson.getId()),
-                educationRepository.getByCVId(cvPerson.getId()), workExpRepository.getByCVId(cvPerson.getId()), trainingRepository.getByCVId(cvPerson.getId()), cvToolRepository.getByCVId(cvPerson.getId()), cvSkillRepository.getByCVId(cvPerson.getId()));
+        CVPerson cvPerson = cvPersonRepository.getCvByRandomString(randomString);
+        return new CVPersonDTO(cvPerson,
+                projectRepository.getByCVId(cvPerson.getId()),
+                educationRepository.getByCVId(cvPerson.getId()),
+                workExpRepository.getByCVId(cvPerson.getId()),
+                trainingRepository.getByCVId(cvPerson.getId()),
+                cvToolRepository.getByCVId(cvPerson.getId()),
+                cvSkillRepository.getByCVId(cvPerson.getId()));
     }
 
     @PostMapping
     public ResponseEntity<Object> post(@RequestBody CVPerson cvPerson) {
         cvPerson.setPerson(personRepository.findById(cvPerson.getPerson().getId()).get());
         cvPersonRepository.save(cvPerson);
+        return CustomResponse.generate(HttpStatus.OK, "Data Saved");
+    }
+
+    @PutMapping("edit/{randomString}")
+    public ResponseEntity<Object> edit(@PathVariable String randomString, @RequestBody CVPersonEditDTO editDTO) {
+        CVPerson cvPerson = cvPersonRepository.getCvByRandomString(randomString);
+        cvPerson.setPosition(editDTO.getPosition());
+        cvPerson.setSummary(editDTO.getSummary());
+        cvPersonRepository.save(cvPerson);
+
+        Person person = personRepository.findById(cvPerson.getId()).get();
+        person.setName(editDTO.getName());
+        personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 }
