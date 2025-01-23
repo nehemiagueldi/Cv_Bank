@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.model.Training;
 
 @Repository
-public interface TrainingRepository extends JpaRepository<Training, Integer> {
+public interface TrainingRepository extends JpaRepository<Training, Long> {
   @Query(value = "SELECT COUNT(*) FROM tb_training WHERE cv_id = ?", nativeQuery = true)
   public Long countByCVId(Integer cvId);
 
