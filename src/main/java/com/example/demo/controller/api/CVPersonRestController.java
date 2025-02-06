@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,13 +67,14 @@ public class CVPersonRestController {
     private CVSkillRepository cvSkillRepository;
     private SkillRepository skillRepository;
     private ToolRepository toolRepository;
+    private DegreeRepository degreeRepository;
 
     @Autowired
     public CVPersonRestController(CVPersonRepository cvPersonRepository, PersonRepository personRepository,
             ProjectRepository projectRepository, EducationRepository educationRepository,
             WorkExpRepository workExpRepository, TrainingRepository trainingRepository,
             CVToolRepository cvToolRepository, CVSkillRepository cvSkillRepository, SkillRepository skillRepository,
-            ToolRepository toolRepository) {
+            ToolRepository toolRepository, DegreeRepository degreeRepository) {
         this.cvPersonRepository = cvPersonRepository;
         this.personRepository = personRepository;
         this.projectRepository = projectRepository;
@@ -82,6 +85,7 @@ public class CVPersonRestController {
         this.cvSkillRepository = cvSkillRepository;
         this.skillRepository = skillRepository;
         this.toolRepository = toolRepository;
+        this.degreeRepository = degreeRepository;
     }
 
     @GetMapping("percent")
@@ -113,6 +117,7 @@ public class CVPersonRestController {
     @PutMapping("edit/{randomString}")
     public ResponseEntity<Object> edit(@PathVariable String randomString, @RequestBody CVPersonEditDTO editDTO) {
         CVPerson cvPerson = cvPersonRepository.getCvByRandomString(randomString);
+        // cvPerson.setPhoto_profile(editDTO.getPhoto_profile());
         cvPerson.setPosition(editDTO.getPosition());
         cvPerson.setSummary(editDTO.getSummary());
         cvPersonRepository.save(cvPerson);
@@ -313,36 +318,129 @@ public class CVPersonRestController {
 
         Person person = personRepository.findById(cvPerson.getId()).get();
         person.setName(editDTO.getName());
+        // person.setGender(editDTO.getGender());
+        // person.setBirthdate(editDTO.getBirthdate());
         personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 
     @GetMapping
-    public Map<String, Object> getTransaction(@RequestParam("draw") int draw,
-            @RequestParam("start") int start, @RequestParam("length") int length,
-            @RequestParam(required = false, defaultValue = "") String search) {
-        int page = start / length;
+    public Map<String, Object> get(
+            @RequestParam("draw") Integer draw,
+            @RequestParam("start") Integer start,
+            @RequestParam("length") Integer length,
+            @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false, defaultValue = "") String gender,
+            @RequestParam(required = false, defaultValue = "") List<String> skill,
+            @RequestParam(required = false, defaultValue = "") String major,
+            @RequestParam(required = false, defaultValue = "") Integer experience,
+            @RequestParam(required = false, defaultValue = "") Integer age) {
+
+        Integer page = start / length;
+
+        List<CVPerson> cvPersonList = cvPersonRepository.findAll();
+        if (age != null) {
+            cvPersonList = cvPersonRepository.getCvByAge(age - 5, age);
+        }
+
+        if (!gender.isEmpty()) {
+            cvPersonList = cvPersonRepository.getCvByGender(gender);
+        }
+
+        if (!search.isEmpty()) {
+            cvPersonList = cvPersonRepository.getCvByPosition(search);
+        }
+
+        if (!skill.isEmpty()) {
+            List<CVSkill> cvSkills = cvSkillRepository.getSkillBySearch(skill);
+            cvPersonList = cvSkills.stream()
+                    .map(cvSkill -> cvPersonRepository.findById(cvSkill.getCvPerson().getId()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        if (!major.isEmpty()) {
+            List<Education> educations = educationRepository.findMajorBySearch(major);
+            cvPersonList = educations.stream()
+                    .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        List<CVPersonDTO> cvPersonDTOList = cvPersonList.stream()
+                .map(cv -> {
+                    CVPerson cvPerson = cvPersonRepository.getCvByRandomString(cv.getRandomString());
+                    List<Project> projects = projectRepository.getByCVId(cvPerson.getId());
+                    List<WorkExp> workExps = workExpRepository.getByCVId(cvPerson.getId());
+                    int totalExperience = 0;
+                    List<YearMonth> countedMonths = new ArrayList<>();
+
+                    for (WorkExp workExp : workExps) {
+                        LocalDate startDate = workExp.getStart_date();
+                        LocalDate endDate = workExp.getEnd_date();
+
+                        int totalMonths = 0;
+                        LocalDate currentDate = startDate;
+
+                        while (!currentDate.isAfter(endDate)) {
+                            YearMonth yearMonth = YearMonth.from(currentDate);
+
+                            if (!countedMonths.contains(yearMonth)) {
+                                totalMonths++;
+                                countedMonths.add(yearMonth);
+                            }
+
+                            currentDate = currentDate.plusMonths(1);
+                        }
+
+                        totalExperience += totalMonths;
+                    }
+
+                    return new CVPersonDTO(
+                            totalExperience,
+                            Period.between(cvPerson.getPerson().getBirthdate(), LocalDate.now()).getYears(),
+                            cvPerson,
+                            projects,
+                            educationRepository.getByCVId(cvPerson.getId()),
+                            workExpRepository.getByCVId(cvPerson.getId()),
+                            trainingRepository.getByCVId(cvPerson.getId()),
+                            cvToolRepository.getByCVId(cvPerson.getId()),
+                            cvSkillRepository.getByCVId(cvPerson.getId()));
+                })
+                .distinct()
+                .filter(cvPersonDTO -> {
+                    if (experience != null && experience > 0) {
+                        if (experience == 4) {
+                            return cvPersonDTO.getTotalExperience() / 12 >= experience - 2
+                                    && cvPersonDTO.getTotalExperience() / 12 <= experience;
+                        } else if (experience == 9) {
+                            return cvPersonDTO.getTotalExperience() / 12 >= experience;
+                        } else {
+                            return cvPersonDTO.getTotalExperience() / 12 >= experience - 1
+                                    && cvPersonDTO.getTotalExperience() / 12 <= experience;
+                        }
+                    } else if (experience != null && experience == 0) {
+                        return cvPersonDTO.getTotalExperience() < 12;
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        int fromIndex = Math.min(start, cvPersonDTOList.size());
+        int toIndex = Math.min(start + length, cvPersonDTOList.size());
+
+        List<CVPersonDTO> pagedCvPersonDTOList = cvPersonDTOList.subList(fromIndex, toIndex);
 
         PageRequest pageable = PageRequest.of(page, length);
-        Page<CVPerson> cvPersonDTO = cvPersonRepository.getCvByPosition2(search,
-                pageable);
-
-        long totalRecords = getTotalRecords();
-        long filteredRecords = getFilteredRecordsCount(search);
+        Page<CVPersonDTO> cvPersonPage = new PageImpl<>(pagedCvPersonDTOList, pageable, cvPersonDTOList.size());
 
         Map<String, Object> response = new HashMap<>();
         response.put("draw", draw);
-        response.put("recordsTotal", totalRecords);
-        response.put("recordsFiltered", filteredRecords);
-        response.put("data", cvPersonDTO.getContent());
+        response.put("recordsTotal", cvPersonRepository.count());
+        response.put("recordsFiltered", cvPersonDTOList.size());
+        response.put("data", cvPersonPage.getContent());
         return response;
-    }
-
-    private long getTotalRecords() {
-        return cvPersonRepository.count();
-    }
-
-    private long getFilteredRecordsCount(String search) {
-        return cvPersonRepository.countFilteredCVPerson(search);
     }
 }
