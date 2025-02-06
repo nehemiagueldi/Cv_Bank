@@ -334,7 +334,8 @@ public class CVPersonRestController {
             @RequestParam(required = false, defaultValue = "") List<String> skill,
             @RequestParam(required = false, defaultValue = "") String major,
             @RequestParam(required = false, defaultValue = "") Integer experience,
-            @RequestParam(required = false, defaultValue = "") Integer age) {
+            @RequestParam(required = false, defaultValue = "") Integer age,
+            @RequestParam(required = false, defaultValue = "") String currentOrBefore) {
 
         Integer page = start / length;
 
@@ -348,7 +349,7 @@ public class CVPersonRestController {
         }
 
         if (!search.isEmpty()) {
-            cvPersonList = cvPersonRepository.getCvByPosition(search);
+            cvPersonList = cvPersonRepository.getCvByPositionOrCompany(search);
         }
 
         if (!skill.isEmpty()) {

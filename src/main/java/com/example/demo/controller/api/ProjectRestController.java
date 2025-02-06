@@ -58,7 +58,7 @@ public class ProjectRestController {
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<Object> edit(@PathVariable Integer id, @RequestBody Project projectEdit) {
+    public ResponseEntity<Object> edit(@PathVariable Long id, @RequestBody Project projectEdit) {
         Project project = projectRepository.findById(id).get();
         if (project.getCvPerson().getId() == projectEdit.getCvPerson().getId()) {
             project.setName(projectEdit.getName());
@@ -74,7 +74,7 @@ public class ProjectRestController {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Integer id, @RequestParam("cvId") Integer cvId) {
+    public ResponseEntity<Object> delete(@PathVariable Long id, @RequestParam("cvId") Integer cvId) {
         if (projectRepository.countByCVId(cvId) == 1) {
             CVPerson cvPerson = cvPersonRepository.findById(cvId).get();
             cvPerson.setPercentage_progress(cvPerson.getPercentage_progress() - 20);

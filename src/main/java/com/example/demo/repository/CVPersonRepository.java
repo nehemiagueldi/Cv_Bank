@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -18,8 +19,10 @@ public interface CVPersonRepository extends JpaRepository<CVPerson, Integer> {
 
         @Query(value = "SELECT * FROM tb_cv_person cp " +
                         "JOIN tb_person p ON cp.person_id = p.id " +
-                        "WHERE LOWER(position) LIKE LOWER(CONCAT('%', :search, '%')) ", nativeQuery = true)
-        public List<CVPerson> getCvByPosition(@Param("search") String search);
+                        "JOIN tb_work_exp w ON cp.id = w.cv_id " +
+                        "WHERE LOWER(cp.position) LIKE LOWER(CONCAT('%', :search, '%')) " +
+                        "OR LOWER(w.company) LIKE LOWER(CONCAT('%', :search, '%')) ", nativeQuery = true)
+        public List<CVPerson> getCvByPositionOrCompany(@Param("search") String search);
 
         @Query(value = "SELECT * FROM tb_cv_person cp " +
                         "JOIN tb_person p ON cp.person_id = p.id " +
@@ -49,4 +52,5 @@ public interface CVPersonRepository extends JpaRepository<CVPerson, Integer> {
                         "            ELSE NULL " +
                         "         END) LIKE LOWER(CONCAT('%', :search, '%')) ", nativeQuery = true)
         long countFilteredCVPerson(@Param("search") String search);
+
 }
