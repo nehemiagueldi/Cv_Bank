@@ -1,5 +1,6 @@
 package com.example.demo.model.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.example.demo.model.Education;
@@ -16,6 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CVPersonEditDTO {
     private String name;
+    // private Character gender;
+    // private LocalDate birthdate;
+    // private String photo_profile;
     private String position;
     private String summary;
     private List<Integer> skillsSelected;
