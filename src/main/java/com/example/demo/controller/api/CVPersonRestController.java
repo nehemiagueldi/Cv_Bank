@@ -316,8 +316,8 @@ public class CVPersonRestController {
 
         Person person = personRepository.findById(cvPerson.getId()).get();
         person.setName(editDTO.getName());
-        person.setGender(editDTO.getGender());
-        person.setBirthdate(editDTO.getBirthdate());
+        // person.setGender(editDTO.getGender());
+        // person.setBirthdate(editDTO.getBirthdate());
         personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
