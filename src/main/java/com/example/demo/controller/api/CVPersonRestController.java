@@ -67,14 +67,13 @@ public class CVPersonRestController {
     private CVSkillRepository cvSkillRepository;
     private SkillRepository skillRepository;
     private ToolRepository toolRepository;
-    private DegreeRepository degreeRepository;
 
     @Autowired
     public CVPersonRestController(CVPersonRepository cvPersonRepository, PersonRepository personRepository,
             ProjectRepository projectRepository, EducationRepository educationRepository,
             WorkExpRepository workExpRepository, TrainingRepository trainingRepository,
             CVToolRepository cvToolRepository, CVSkillRepository cvSkillRepository, SkillRepository skillRepository,
-            ToolRepository toolRepository, DegreeRepository degreeRepository) {
+            ToolRepository toolRepository) {
         this.cvPersonRepository = cvPersonRepository;
         this.personRepository = personRepository;
         this.projectRepository = projectRepository;
@@ -85,7 +84,6 @@ public class CVPersonRestController {
         this.cvSkillRepository = cvSkillRepository;
         this.skillRepository = skillRepository;
         this.toolRepository = toolRepository;
-        this.degreeRepository = degreeRepository;
     }
 
     @GetMapping("percent")
@@ -318,8 +316,8 @@ public class CVPersonRestController {
 
         Person person = personRepository.findById(cvPerson.getId()).get();
         person.setName(editDTO.getName());
-        // person.setGender(editDTO.getGender());
-        // person.setBirthdate(editDTO.getBirthdate());
+        person.setGender(editDTO.getGender());
+        person.setBirthdate(editDTO.getBirthdate());
         personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
@@ -333,6 +331,8 @@ public class CVPersonRestController {
             @RequestParam(required = false, defaultValue = "") String gender,
             @RequestParam(required = false, defaultValue = "") List<String> skill,
             @RequestParam(required = false, defaultValue = "") String major,
+            @RequestParam(required = false, defaultValue = "") String university,
+            @RequestParam(required = false, defaultValue = "") Double gpa,
             @RequestParam(required = false, defaultValue = "") Integer experience,
             @RequestParam(required = false, defaultValue = "") Integer age,
             @RequestParam(required = false, defaultValue = "") String currentOrBefore) {
@@ -364,6 +364,30 @@ public class CVPersonRestController {
         if (!major.isEmpty()) {
             List<Education> educations = educationRepository.findMajorBySearch(major);
             cvPersonList = educations.stream()
+                    .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        if (!university.isEmpty()) {
+            List<Education> universities = educationRepository.findUniversityBySearch(university);
+            cvPersonList = universities.stream()
+                    .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        if (gpa != null && gpa != 0) {
+            double gpaStart;
+            if (gpa == 3.5) {
+                gpaStart = gpa - 0.5;
+            } else {
+                gpaStart = gpa - 0.25;
+            }
+            List<Education> gpas = educationRepository.findGPABySearch(gpa, gpaStart);
+            cvPersonList = gpas.stream()
                     .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
                     .filter(Objects::nonNull)
                     .distinct()

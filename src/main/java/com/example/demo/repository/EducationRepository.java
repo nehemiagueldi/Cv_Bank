@@ -23,4 +23,10 @@ public interface EducationRepository extends JpaRepository<Education, Long> {
 
     @Query(value = "SELECT * FROM tb_education e JOIN tb_university u ON e.university_id = u.id JOIN tb_degree d ON e.degree_id = d.id JOIN tb_major m ON e.major_id = m.id WHERE LOWER(m.name) LIKE LOWER(CONCAT('%', :search, '%'))", nativeQuery = true)
     List<Education> findMajorBySearch(@Param("search") String search);
+
+    @Query(value = "SELECT * FROM tb_education e JOIN tb_university u ON e.university_id = u.id JOIN tb_degree d ON e.degree_id = d.id JOIN tb_major m ON e.major_id = m.id WHERE LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%'))", nativeQuery = true)
+    List<Education> findUniversityBySearch(@Param("search") String search);
+
+    @Query(value = "SELECT * FROM tb_education e WHERE e.gpa > :ipkStart AND e.gpa <= :ipkEnd", nativeQuery = true)
+    List<Education> findGPABySearch(@Param("ipkEnd") Double ipkEnd, Double ipkStart);
 }
