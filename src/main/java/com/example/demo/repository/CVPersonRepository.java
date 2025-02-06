@@ -16,20 +16,24 @@ public interface CVPersonRepository extends JpaRepository<CVPerson, Integer> {
         @Query(value = "SELECT * FROM tb_cv_person WHERE random_string = ?", nativeQuery = true)
         public CVPerson getCvByRandomString(@Param("randomString") String randomString);
 
-        @Query(value = "SELECT * FROM tb_cv_person cp JOIN tb_person p ON cp.person_id = p.id WHERE LOWER(position) LIKE LOWER(CONCAT('%', :search, '%')) OR (TIMESTAMPDIFF(YEAR, p.birthdate, CURRENT_DATE)) <= CAST(:search AS SIGNED)", nativeQuery = true)
+        @Query(value = "SELECT * FROM tb_cv_person cp " +
+                        "JOIN tb_person p ON cp.person_id = p.id " +
+                        "WHERE LOWER(position) LIKE LOWER(CONCAT('%', :search, '%')) ", nativeQuery = true)
         public List<CVPerson> getCvByPosition(@Param("search") String search);
 
         @Query(value = "SELECT * FROM tb_cv_person cp " +
                         "JOIN tb_person p ON cp.person_id = p.id " +
-                        "WHERE LOWER(position) LIKE LOWER(CONCAT('%', :search, '%')) " +
-                        "OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
-                        "OR (TIMESTAMPDIFF(YEAR, p.birthdate, CURRENT_DATE)) <= CAST(:search AS SIGNED) " +
-                        "OR LOWER(CASE " +
+                        "WHERE LOWER(CASE " +
                         "            WHEN p.gender = 'M' THEN 'Male' " +
                         "            WHEN p.gender = 'F' THEN 'Female' " +
                         "            ELSE NULL " +
-                        "         END) LIKE LOWER(CONCAT('%', :search, '%')) ", nativeQuery = true)
-        public Page<CVPerson> getCvByPosition2(@Param("search") String search, Pageable pageable);
+                        "         END) LIKE LOWER(CONCAT('%', :gender, '%')) ", nativeQuery = true)
+        public List<CVPerson> getCvByGender(@Param("gender") String gender);
+
+        @Query(value = "SELECT * FROM tb_cv_person cp " +
+                        "JOIN tb_person p ON cp.person_id = p.id " +
+                        "WHERE TIMESTAMPDIFF(YEAR, p.birthdate, CURRENT_DATE) BETWEEN :age AND :ageEnd", nativeQuery = true)
+        public List<CVPerson> getCvByAge(@Param("age") Integer age, Integer ageEnd);
 
         @Query(value = "SELECT cp.percentage_progress FROM tb_cv_person cp JOIN tb_person p ON p.id = cp.person_id WHERE p.email = ?", nativeQuery = true)
         public Double getPercentagerProgress(@Param("email") String email);
@@ -45,7 +49,4 @@ public interface CVPersonRepository extends JpaRepository<CVPerson, Integer> {
                         "            ELSE NULL " +
                         "         END) LIKE LOWER(CONCAT('%', :search, '%')) ", nativeQuery = true)
         long countFilteredCVPerson(@Param("search") String search);
-
-        @Query(value = "SELECT * FROM tb_cv_person WHERE person_id = ?", nativeQuery = true)
-        public CVPerson getCvPersonByPersonId(@Param("personId") Integer id);
 }
