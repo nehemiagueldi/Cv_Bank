@@ -52,7 +52,7 @@ public class WorkExpRestController {
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<Object> put(@PathVariable Integer id, @RequestBody WorkExp workExpEdit) {
+    public ResponseEntity<Object> put(@PathVariable Long id, @RequestBody WorkExp workExpEdit) {
         WorkExp workExp = workExpRepository.findById(id).get();
         if (workExp.getCvPerson().getId() == workExpEdit.getCvPerson().getId()) {
             workExp.setName(workExpEdit.getName());
@@ -68,7 +68,7 @@ public class WorkExpRestController {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Integer id, @RequestParam("cvId") Integer cvId) {
+    public ResponseEntity<Object> delete(@PathVariable Long id, @RequestParam("cvId") Integer cvId) {
         if (workExpRepository.countByCVId(cvId) == 1) {
             CVPerson cvPerson = cvPersonRepository.findById(cvId).get();
             cvPerson.setPercentage_progress(cvPerson.getPercentage_progress() - 20);

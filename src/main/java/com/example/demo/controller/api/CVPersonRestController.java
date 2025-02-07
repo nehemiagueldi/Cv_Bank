@@ -316,8 +316,8 @@ public class CVPersonRestController {
 
         Person person = personRepository.findById(cvPerson.getId()).get();
         person.setName(editDTO.getName());
-        person.setGender(editDTO.getGender());
-        person.setBirthdate(editDTO.getBirthdate());
+        // person.setGender(editDTO.getGender());
+        // person.setBirthdate(editDTO.getBirthdate());
         personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
@@ -334,7 +334,8 @@ public class CVPersonRestController {
             @RequestParam(required = false, defaultValue = "") String university,
             @RequestParam(required = false, defaultValue = "") Double gpa,
             @RequestParam(required = false, defaultValue = "") Integer experience,
-            @RequestParam(required = false, defaultValue = "") Integer age) {
+            @RequestParam(required = false, defaultValue = "") Integer age,
+            @RequestParam(required = false, defaultValue = "") String currentOrBefore) {
 
         Integer page = start / length;
 
@@ -348,7 +349,7 @@ public class CVPersonRestController {
         }
 
         if (!search.isEmpty()) {
-            cvPersonList = cvPersonRepository.getCvByPosition(search);
+            cvPersonList = cvPersonRepository.getCvByPositionOrCompany(search);
         }
 
         if (!skill.isEmpty()) {
