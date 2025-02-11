@@ -67,13 +67,14 @@ public class CVPersonRestController {
     private CVSkillRepository cvSkillRepository;
     private SkillRepository skillRepository;
     private ToolRepository toolRepository;
+    private DegreeRepository degreeRepository;
 
     @Autowired
     public CVPersonRestController(CVPersonRepository cvPersonRepository, PersonRepository personRepository,
             ProjectRepository projectRepository, EducationRepository educationRepository,
             WorkExpRepository workExpRepository, TrainingRepository trainingRepository,
             CVToolRepository cvToolRepository, CVSkillRepository cvSkillRepository, SkillRepository skillRepository,
-            ToolRepository toolRepository) {
+            ToolRepository toolRepository, DegreeRepository degreeRepository) {
         this.cvPersonRepository = cvPersonRepository;
         this.personRepository = personRepository;
         this.projectRepository = projectRepository;
@@ -84,6 +85,7 @@ public class CVPersonRestController {
         this.cvSkillRepository = cvSkillRepository;
         this.skillRepository = skillRepository;
         this.toolRepository = toolRepository;
+        this.degreeRepository = degreeRepository;
     }
 
     @GetMapping("percent")
@@ -115,7 +117,7 @@ public class CVPersonRestController {
     @PutMapping("edit/{randomString}")
     public ResponseEntity<Object> edit(@PathVariable String randomString, @RequestBody CVPersonEditDTO editDTO) {
         CVPerson cvPerson = cvPersonRepository.getCvByRandomString(randomString);
-        // cvPerson.setPhoto_profile(editDTO.getPhoto_profile());
+        cvPerson.setPhoto_profile(editDTO.getPhotoProfile());
         cvPerson.setPosition(editDTO.getPosition());
         cvPerson.setSummary(editDTO.getSummary());
         cvPersonRepository.save(cvPerson);
@@ -314,7 +316,7 @@ public class CVPersonRestController {
             }
         }
 
-        Person person = personRepository.findById(cvPerson.getId()).get();
+        Person person = personRepository.findById(cvPerson.getPerson().getId()).get();
         person.setName(editDTO.getName());
         // person.setGender(editDTO.getGender());
         // person.setBirthdate(editDTO.getBirthdate());
