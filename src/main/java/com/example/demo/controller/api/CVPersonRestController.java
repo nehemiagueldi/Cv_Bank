@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.CVPerson;
@@ -43,7 +46,6 @@ import com.example.demo.model.dto.CVPersonEditDTO;
 import com.example.demo.repository.CVPersonRepository;
 import com.example.demo.repository.CVSkillRepository;
 import com.example.demo.repository.CVToolRepository;
-import com.example.demo.repository.DegreeRepository;
 import com.example.demo.repository.EducationRepository;
 import com.example.demo.repository.PersonRepository;
 import com.example.demo.repository.ProjectRepository;
@@ -67,14 +69,13 @@ public class CVPersonRestController {
     private CVSkillRepository cvSkillRepository;
     private SkillRepository skillRepository;
     private ToolRepository toolRepository;
-    private DegreeRepository degreeRepository;
 
     @Autowired
     public CVPersonRestController(CVPersonRepository cvPersonRepository, PersonRepository personRepository,
             ProjectRepository projectRepository, EducationRepository educationRepository,
             WorkExpRepository workExpRepository, TrainingRepository trainingRepository,
             CVToolRepository cvToolRepository, CVSkillRepository cvSkillRepository, SkillRepository skillRepository,
-            ToolRepository toolRepository, DegreeRepository degreeRepository) {
+            ToolRepository toolRepository) {
         this.cvPersonRepository = cvPersonRepository;
         this.personRepository = personRepository;
         this.projectRepository = projectRepository;
@@ -85,7 +86,6 @@ public class CVPersonRestController {
         this.cvSkillRepository = cvSkillRepository;
         this.skillRepository = skillRepository;
         this.toolRepository = toolRepository;
-        this.degreeRepository = degreeRepository;
     }
 
     @GetMapping("percent")
@@ -318,156 +318,126 @@ public class CVPersonRestController {
 
         Person person = personRepository.findById(cvPerson.getPerson().getId()).get();
         person.setName(editDTO.getName());
-        // person.setGender(editDTO.getGender());
-        // person.setBirthdate(editDTO.getBirthdate());
+        person.setGender(editDTO.getGender());
+        person.setBirthdate(editDTO.getBirthdate());
         personRepository.save(person);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
 
     @GetMapping
-    public Map<String, Object> get(
+    @ResponseBody
+    public Map<String, Object> getMapping(
             @RequestParam("draw") Integer draw,
             @RequestParam("start") Integer start,
             @RequestParam("length") Integer length,
             @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false, defaultValue = "") String position,
             @RequestParam(required = false, defaultValue = "") String gender,
-            @RequestParam(required = false, defaultValue = "") List<String> skill,
+            @RequestParam(required = false) Integer age,
+            @RequestParam(required = false, defaultValue = "") String skill,
+            @RequestParam(required = false) Double gpa,
             @RequestParam(required = false, defaultValue = "") String major,
             @RequestParam(required = false, defaultValue = "") String university,
-            @RequestParam(required = false, defaultValue = "") Double gpa,
-            @RequestParam(required = false, defaultValue = "") Integer experience,
-            @RequestParam(required = false, defaultValue = "") Integer age,
-            @RequestParam(required = false, defaultValue = "") String currentOrBefore) {
+            @RequestParam(required = false, defaultValue = "") String company,
+            @RequestParam(required = false, defaultValue = "") String jobDesc,
+            @RequestParam(required = false) Integer experience) {
 
-        Integer page = start / length;
+        if (start == null || start < 0)
+            start = 0;
+        if (length == null || length <= 0)
+            length = 10;
 
-        List<CVPerson> cvPersonList = cvPersonRepository.findAll();
-        if (age != null) {
-            cvPersonList = cvPersonRepository.getCvByAge(age - 5, age);
-        }
+        int ageStart = (age != null) ? age : 0;
+        int ageEnd = (age != null && age <= 30) ? age == 20 ? age + 6 : age + 5 : 100;
 
-        if (!gender.isEmpty()) {
-            cvPersonList = cvPersonRepository.getCvByGender(gender);
-        }
+        Double gpaStart = (gpa != null) ? gpa : null;
+        Double gpaEnd = (gpa != null) ? (gpa == 3 ? gpa + 0.5 : gpa + 0.25) : null;
 
-        if (!search.isEmpty()) {
-            cvPersonList = cvPersonRepository.getCvByPositionOrCompany(search);
-        }
+        List<String> skillList = (skill == null || skill.isBlank())
+                ? Collections.emptyList()
+                : Arrays.stream(skill.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .collect(Collectors.toList());
 
-        if (!skill.isEmpty()) {
-            List<CVSkill> cvSkills = cvSkillRepository.getSkillBySearch(skill);
-            cvPersonList = cvSkills.stream()
-                    .map(cvSkill -> cvPersonRepository.findById(cvSkill.getCvPerson().getId()).orElse(null))
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
+        company = company.isBlank() ? null : company;
+        jobDesc = jobDesc.isBlank() ? null : jobDesc;
 
-        if (!major.isEmpty()) {
-            List<Education> educations = educationRepository.findMajorBySearch(major);
-            cvPersonList = educations.stream()
-                    .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
+        long recordsTotal = cvPersonRepository.count();
 
-        if (!university.isEmpty()) {
-            List<Education> universities = educationRepository.findUniversityBySearch(university);
-            cvPersonList = universities.stream()
-                    .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
+        List<CVPerson> cvPersonList = cvPersonRepository.findCvPersonDTOs2(
+                search, position, gender, ageStart, ageEnd, skillList, gpaStart, gpaEnd, major, university, company,
+                jobDesc);
 
-        if (gpa != null && gpa != 0) {
-            double gpaStart;
-            if (gpa == 3.5) {
-                gpaStart = gpa - 0.5;
-            } else {
-                gpaStart = gpa - 0.25;
-            }
-            List<Education> gpas = educationRepository.findGPABySearch(gpa, gpaStart);
-            cvPersonList = gpas.stream()
-                    .map(education -> cvPersonRepository.findById(education.getCvPerson().getId()).orElse(null))
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
-
-        List<CVPersonDTO> cvPersonDTOList = cvPersonList.stream()
-                .map(cv -> {
-                    CVPerson cvPerson = cvPersonRepository.getCvByRandomString(cv.getRandomString());
-                    List<Project> projects = projectRepository.getByCVId(cvPerson.getId());
-                    List<WorkExp> workExps = workExpRepository.getByCVId(cvPerson.getId());
-                    int totalExperience = 0;
-                    List<YearMonth> countedMonths = new ArrayList<>();
-
-                    for (WorkExp workExp : workExps) {
-                        LocalDate startDate = workExp.getStart_date();
-                        LocalDate endDate = workExp.getEnd_date();
-
-                        int totalMonths = 0;
-                        LocalDate currentDate = startDate;
-
-                        while (!currentDate.isAfter(endDate)) {
-                            YearMonth yearMonth = YearMonth.from(currentDate);
-
-                            if (!countedMonths.contains(yearMonth)) {
-                                totalMonths++;
-                                countedMonths.add(yearMonth);
-                            }
-
-                            currentDate = currentDate.plusMonths(1);
-                        }
-
-                        totalExperience += totalMonths;
-                    }
-
-                    return new CVPersonDTO(
-                            totalExperience,
-                            Period.between(cvPerson.getPerson().getBirthdate(), LocalDate.now()).getYears(),
-                            cvPerson,
-                            projects,
-                            educationRepository.getByCVId(cvPerson.getId()),
-                            workExpRepository.getByCVId(cvPerson.getId()),
-                            trainingRepository.getByCVId(cvPerson.getId()),
-                            cvToolRepository.getByCVId(cvPerson.getId()),
-                            cvSkillRepository.getByCVId(cvPerson.getId()));
-                })
-                .distinct()
-                .filter(cvPersonDTO -> {
-                    if (experience != null && experience > 0) {
+        List<Map<String, Object>> filteredCvPersons = cvPersonList.stream()
+                .filter(cvPerson -> {
+                    int totalExperienceMonths = calculateTotalExperience(cvPerson);
+                    int totalExperienceYears = totalExperienceMonths / 12;
+                    if (experience != null) {
                         if (experience == 4) {
-                            return cvPersonDTO.getTotalExperience() / 12 >= experience - 2
-                                    && cvPersonDTO.getTotalExperience() / 12 <= experience;
+                            return totalExperienceYears >= experience - 2 && totalExperienceYears <= experience;
                         } else if (experience == 9) {
-                            return cvPersonDTO.getTotalExperience() / 12 >= experience;
+                            return totalExperienceYears >= experience;
                         } else {
-                            return cvPersonDTO.getTotalExperience() / 12 >= experience - 1
-                                    && cvPersonDTO.getTotalExperience() / 12 <= experience;
+                            return totalExperienceYears >= experience - 1 && totalExperienceYears <= experience;
                         }
-                    } else if (experience != null && experience == 0) {
-                        return cvPersonDTO.getTotalExperience() < 12;
                     }
                     return true;
                 })
+                .map(cvPerson -> {
+                    Map<String, Object> personData = new HashMap<>();
+                    personData.put("cvPerson", cvPerson);
+                    personData.put("totalExperience", calculateTotalExperience(cvPerson));
+                    personData.put("age",
+                            Period.between(cvPerson.getPerson().getBirthdate(), LocalDate.now()).getYears());
+                    return personData;
+                })
                 .collect(Collectors.toList());
 
-        int fromIndex = Math.min(start, cvPersonDTOList.size());
-        int toIndex = Math.min(start + length, cvPersonDTOList.size());
+        int recordsFiltered = filteredCvPersons.size();
 
-        List<CVPersonDTO> pagedCvPersonDTOList = cvPersonDTOList.subList(fromIndex, toIndex);
+        int end = Math.min(start + length, recordsFiltered);
 
-        PageRequest pageable = PageRequest.of(page, length);
-        Page<CVPersonDTO> cvPersonPage = new PageImpl<>(pagedCvPersonDTOList, pageable, cvPersonDTOList.size());
+        List<Map<String, Object>> paginatedData = (start < recordsFiltered)
+                ? filteredCvPersons.subList(start, end)
+                : Collections.emptyList();
 
         Map<String, Object> response = new HashMap<>();
         response.put("draw", draw);
-        response.put("recordsTotal", cvPersonRepository.count());
-        response.put("recordsFiltered", cvPersonDTOList.size());
-        response.put("data", cvPersonPage.getContent());
+        response.put("recordsTotal", recordsTotal);
+        response.put("recordsFiltered", recordsFiltered);
+        response.put("data", paginatedData);
+
         return response;
     }
+
+    private int calculateTotalExperience(CVPerson cvPerson) {
+        List<WorkExp> workExps = workExpRepository.getByCVId(cvPerson.getId());
+        int totalExperience = 0;
+        List<YearMonth> countedMonths = new ArrayList<>();
+
+        for (WorkExp workExp : workExps) {
+            LocalDate startDate = workExp.getStart_date();
+            LocalDate endDate = workExp.getEnd_date();
+
+            int totalMonths = 0;
+            LocalDate currentDate = startDate;
+
+            while (!currentDate.isAfter(endDate)) {
+                YearMonth yearMonth = YearMonth.from(currentDate);
+
+                if (!countedMonths.contains(yearMonth)) {
+                    totalMonths++;
+                    countedMonths.add(yearMonth);
+                }
+
+                currentDate = currentDate.plusMonths(1);
+            }
+
+            totalExperience += totalMonths;
+        }
+
+        return totalExperience;
+    }
+
 }

@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CVPersonEditDTO {
     private String name;
-    // private Character gender;
-    // private LocalDate birthdate;
-    // private String photo_profile;
+    private Character gender;
+    private LocalDate birthdate;
+    private String photoProfile;
     private String position;
     private String summary;
     private List<Integer> skillsSelected;
