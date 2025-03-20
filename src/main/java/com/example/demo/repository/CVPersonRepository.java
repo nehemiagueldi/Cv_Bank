@@ -106,9 +106,11 @@ public interface CVPersonRepository extends JpaRepository<CVPerson, Integer> {
                         "   LOWER(pe.gender) LIKE LOWER(CONCAT('%', :gender, '%'))) " +
                         ") " +
                         "AND (" +
-                        "   (:position IS NULL OR " +
-                        "   LOWER(cp.position) LIKE LOWER(CONCAT('%', :position, '%'))) " +
-                        ") " +
+                        "    :position IS NULL " +
+                        "    OR cp.position IS NULL " +
+                        "    OR LOWER(cp.position) LIKE LOWER(CONCAT('%', :position, '%')) " +
+                        ")"
+                        +
                         "AND (" +
                         "   (:age IS NULL OR :ageEnd IS NULL OR " +
                         "   TIMESTAMPDIFF(YEAR, pe.birthdate, CURRENT_DATE) BETWEEN :age AND :ageEnd) " +
@@ -128,13 +130,13 @@ public interface CVPersonRepository extends JpaRepository<CVPerson, Integer> {
                         ") "
                         +
                         "AND (" +
-                        "   (:major IS NULL AND :university IS NULL) " + // Jika kedua parameter NULL, tidak ada filter
-                                                                         // (semua data muncul)
+                        "   (:major IS NULL AND :university IS NULL) " +
                         "   OR EXISTS (SELECT 1 FROM Education e WHERE e.cvPerson = cp " +
                         "              AND (:major IS NULL OR LOWER(m.name) LIKE LOWER(CONCAT('%', :major, '%'))) " +
                         "              AND (:university IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :university, '%')))) "
                         +
                         ") "
+
                         +
                         "AND (" +
                         "   (:company IS NULL AND :jobDesc IS NULL) OR " +

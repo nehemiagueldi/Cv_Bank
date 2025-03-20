@@ -9,15 +9,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,6 +37,7 @@ import com.example.demo.model.Skill;
 import com.example.demo.model.Tool;
 import com.example.demo.model.Training;
 import com.example.demo.model.WorkExp;
+import com.example.demo.model.dto.CVPersonAddDTO;
 import com.example.demo.model.dto.CVPersonDTO;
 import com.example.demo.model.dto.CVPersonEditDTO;
 import com.example.demo.repository.CVPersonRepository;
@@ -107,8 +104,18 @@ public class CVPersonRestController {
     }
 
     @PostMapping
-    public ResponseEntity<Object> post(@RequestBody CVPerson cvPerson) {
-        cvPerson.setPerson(personRepository.findById(cvPerson.getPerson().getId()).get());
+    public ResponseEntity<Object> post(@RequestBody CVPersonAddDTO cvPersonAddDTO) {
+        Person person = new Person();
+        person.setBirthdate(cvPersonAddDTO.getBirthdate());
+        person.setEmail(cvPersonAddDTO.getEmail());
+        person.setName(cvPersonAddDTO.getFirstName() + " " + cvPersonAddDTO.getLastName());
+        person.setGender(cvPersonAddDTO.getGender());
+        personRepository.save(person);
+
+        CVPerson cvPerson = new CVPerson();
+        cvPerson.setPosition("Developer");
+        cvPerson.setPerson(person);
+        cvPerson.setRandomString(cvPersonAddDTO.getRandomString());
         cvPersonRepository.save(cvPerson);
         return CustomResponse.generate(HttpStatus.OK, "Data Saved");
     }
@@ -359,6 +366,10 @@ public class CVPersonRestController {
                         .map(String::trim)
                         .filter(s -> !s.isEmpty())
                         .collect(Collectors.toList());
+
+        major = major.isBlank() ? null : major;
+        university = university.isBlank() ? null : university;
+        position = position.isBlank() ? null : position;
 
         company = company.isBlank() ? null : company;
         jobDesc = jobDesc.isBlank() ? null : jobDesc;
