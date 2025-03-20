@@ -59,8 +59,8 @@ public class TrainingRestController {
       training.setName(trainingEdit.getName());
       training.setDescription(trainingEdit.getDescription());
       training.setCompany(trainingEdit.getCompany());
-      training.setStart_date(trainingEdit.getStart_date());
-      training.setEnd_date(trainingEdit.getEnd_date());
+      training.setStartDate(trainingEdit.getStartDate());
+      training.setEndDate(trainingEdit.getEndDate());
       trainingRepository.save(training);
       return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
     } else {

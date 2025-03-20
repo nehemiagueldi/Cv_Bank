@@ -198,8 +198,8 @@ public class CVPersonRestController {
                         workExp.setName(workExpEdit.getName());
                         workExp.setDescription(workExpEdit.getDescription());
                         workExp.setCompany(workExpEdit.getCompany());
-                        workExp.setStart_date(workExpEdit.getStart_date());
-                        workExp.setEnd_date(workExpEdit.getEnd_date());
+                        workExp.setStartDate(workExpEdit.getStartDate());
+                        workExp.setEndDate(workExpEdit.getEndDate());
                         workExpRepository.save(workExp);
                         break;
                     }
@@ -209,8 +209,8 @@ public class CVPersonRestController {
                 newWorkExp.setName(workExpEdit.getName());
                 newWorkExp.setDescription(workExpEdit.getDescription());
                 newWorkExp.setCompany(workExpEdit.getCompany());
-                newWorkExp.setStart_date(workExpEdit.getStart_date());
-                newWorkExp.setEnd_date(workExpEdit.getEnd_date());
+                newWorkExp.setStartDate(workExpEdit.getStartDate());
+                newWorkExp.setEndDate(workExpEdit.getEndDate());
                 newWorkExp.setCvPerson(cvPerson);
                 workExpRepository.save(newWorkExp);
             }
@@ -233,8 +233,8 @@ public class CVPersonRestController {
                         project.setName(projectEdit.getName());
                         project.setDescription(projectEdit.getDescription());
                         project.setCompany(projectEdit.getCompany());
-                        project.setStart_date(projectEdit.getStart_date());
-                        project.setEnd_date(projectEdit.getEnd_date());
+                        project.setStartDate(projectEdit.getStartDate());
+                        project.setEndDate(projectEdit.getEndDate());
                         projectRepository.save(project);
                     }
                 }
@@ -243,8 +243,8 @@ public class CVPersonRestController {
                 newProject.setName(projectEdit.getName());
                 newProject.setDescription(projectEdit.getDescription());
                 newProject.setCompany(projectEdit.getCompany());
-                newProject.setStart_date(projectEdit.getStart_date());
-                newProject.setEnd_date(projectEdit.getEnd_date());
+                newProject.setStartDate(projectEdit.getStartDate());
+                newProject.setEndDate(projectEdit.getEndDate());
                 newProject.setCvPerson(cvPerson);
                 projectRepository.save(newProject);
 
@@ -268,8 +268,8 @@ public class CVPersonRestController {
                         training.setName(trainingEdit.getName());
                         training.setDescription(trainingEdit.getDescription());
                         training.setCompany(trainingEdit.getCompany());
-                        training.setStart_date(trainingEdit.getStart_date());
-                        training.setEnd_date(trainingEdit.getEnd_date());
+                        training.setStartDate(trainingEdit.getStartDate());
+                        training.setEndDate(trainingEdit.getEndDate());
                         trainingRepository.save(training);
                     }
                 }
@@ -278,8 +278,8 @@ public class CVPersonRestController {
                 newTraining.setName(trainingEdit.getName());
                 newTraining.setDescription(trainingEdit.getDescription());
                 newTraining.setCompany(trainingEdit.getCompany());
-                newTraining.setStart_date(trainingEdit.getStart_date());
-                newTraining.setEnd_date(trainingEdit.getEnd_date());
+                newTraining.setStartDate(trainingEdit.getStartDate());
+                newTraining.setEndDate(trainingEdit.getEndDate());
                 newTraining.setCvPerson(cvPerson);
                 trainingRepository.save(newTraining);
 
@@ -428,8 +428,8 @@ public class CVPersonRestController {
         List<YearMonth> countedMonths = new ArrayList<>();
 
         for (WorkExp workExp : workExps) {
-            LocalDate startDate = workExp.getStart_date();
-            LocalDate endDate = workExp.getEnd_date();
+            LocalDate startDate = workExp.getStartDate();
+            LocalDate endDate = workExp.getEndDate();
 
             int totalMonths = 0;
             LocalDate currentDate = startDate;

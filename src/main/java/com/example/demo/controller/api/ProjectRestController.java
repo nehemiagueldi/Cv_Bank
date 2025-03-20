@@ -64,8 +64,8 @@ public class ProjectRestController {
             project.setName(projectEdit.getName());
             project.setDescription(projectEdit.getDescription());
             project.setCompany(projectEdit.getCompany());
-            project.setStart_date(projectEdit.getStart_date());
-            project.setEnd_date(projectEdit.getEnd_date());
+            project.setStartDate(projectEdit.getStartDate());
+            project.setEndDate(projectEdit.getEndDate());
             projectRepository.save(project);
             return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
         } else {

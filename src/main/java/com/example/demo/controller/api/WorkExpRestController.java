@@ -58,8 +58,8 @@ public class WorkExpRestController {
             workExp.setName(workExpEdit.getName());
             workExp.setDescription(workExpEdit.getDescription());
             workExp.setCompany(workExpEdit.getCompany());
-            workExp.setStart_date(workExpEdit.getStart_date());
-            workExp.setEnd_date(workExpEdit.getEnd_date());
+            workExp.setStartDate(workExpEdit.getStartDate());
+            workExp.setEndDate(workExpEdit.getEndDate());
             workExpRepository.save(workExp);
             return CustomResponse.generate(HttpStatus.OK, "Updated Data Successfully");
         } else {
