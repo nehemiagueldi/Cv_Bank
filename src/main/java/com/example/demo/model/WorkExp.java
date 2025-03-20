@@ -38,10 +38,10 @@ public class WorkExp {
     private String company;
 
     @Column(nullable = false)
-    private LocalDate start_date;
+    private LocalDate startDate;
 
     @Column(nullable = false)
-    private LocalDate end_date;
+    private LocalDate endDate;
 
     @JsonProperty(access = Access.WRITE_ONLY)
     @ManyToOne
