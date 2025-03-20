@@ -66,7 +66,7 @@ public class EducationRestController {
     }
 
     @PutMapping("edit/{id}")
-    public ResponseEntity<Object> put(@PathVariable Integer id, @RequestBody Education educationEdit) {
+    public ResponseEntity<Object> put(@PathVariable Long id, @RequestBody Education educationEdit) {
         Education education = educationRepository.findById(id).orElse(null);
         if (education.getCvPerson().getId() == educationEdit.getCvPerson().getId()) {
             education.setGpa(educationEdit.getGpa());
@@ -83,7 +83,7 @@ public class EducationRestController {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<Object> delete(@PathVariable Integer id, @RequestParam("cvId") Integer cvId) {
+    public ResponseEntity<Object> delete(@PathVariable Long id, @RequestParam("cvId") Integer cvId) {
         if (educationRepository.countByCVId(cvId) == 1) {
             CVPerson cvPerson = cvPersonRepository.findById(cvId).get();
             cvPerson.setPercentage_progress(cvPerson.getPercentage_progress() - 20);

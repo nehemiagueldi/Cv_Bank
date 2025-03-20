@@ -1,5 +1,6 @@
 package com.example.demo.model.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.demo.model.CVPerson;
@@ -18,11 +19,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CVPersonDTO {
+    private Integer totalExperience;
+    private Integer age;
     private CVPerson cvPerson;
-    private List<Project> projects;
-    private List<Education> educations;
-    private List<WorkExp> workExps;
-    private List<Training> trainings;
-    private List<CVTool> cvTools;
-    private List<CVSkill> cvSkills;
+    private List<Project> projects = new ArrayList<>();;
+    private List<Education> educations = new ArrayList<>();
+    private List<WorkExp> workExps = new ArrayList<>();
+    private List<Training> trainings = new ArrayList<>();
+    private List<CVTool> cvTools = new ArrayList<>();
+    private List<CVSkill> cvSkills = new ArrayList<>();
+
 }

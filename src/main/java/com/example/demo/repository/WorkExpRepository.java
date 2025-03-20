@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.model.WorkExp;
 
 @Repository
-public interface WorkExpRepository extends JpaRepository<WorkExp, Integer> {
+public interface WorkExpRepository extends JpaRepository<WorkExp, Long> {
     @Query(value = "SELECT COUNT(*) FROM tb_work_exp WHERE cv_id = ?", nativeQuery = true)
     public Long countByCVId(Integer cvId);
 

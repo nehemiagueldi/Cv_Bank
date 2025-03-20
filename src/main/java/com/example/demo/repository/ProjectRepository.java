@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.model.Project;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Project, Integer> {
+public interface ProjectRepository extends JpaRepository<Project, Long> {
   @Query(value = "SELECT COUNT(*) FROM tb_project WHERE cv_id = ?", nativeQuery = true)
   public Long countByCVId(Integer cvId);
 

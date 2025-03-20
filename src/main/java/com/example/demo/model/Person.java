@@ -22,15 +22,10 @@ public class Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     @Column(length = 255, nullable = false)
     private String name;
     @Column(length = 255, nullable = false)
     private String email;
-    @Column(length = 255, nullable = false)
-    private String phone;
-    @Column(length = 255, nullable = false)
-    private String address;
     @Column(nullable = false)
     private LocalDate birthdate;
     @Column(length = 1, nullable = false)

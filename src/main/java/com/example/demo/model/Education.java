@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 public class Education {
   @Id // PK
   @GeneratedValue(strategy = GenerationType.IDENTITY) // AI
-  private Integer id;
+  private Long id;
   private Double gpa;
   private LocalDate startDate;
   private LocalDate endDate;
@@ -38,7 +38,6 @@ public class Education {
   @ManyToOne
   @JoinColumn(name = "major_id", referencedColumnName = "id")
   private Major major;
-
   @JsonProperty(access = Access.WRITE_ONLY)
   @ManyToOne
   @JoinColumn(name = "cv_id", referencedColumnName = "id")
